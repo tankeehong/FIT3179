@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Vega-Lite Bar Chart</title>
+    <meta charset="utf-8" />
+
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+
+    <style media="screen">
+      /* Add space between Vega-Embed links  */
+      .vega-actions a {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Week 10 Homework</h1>
+    <!-- Container for the visualization -->
+    <div id="vis"></div>
+
+    <script>
+      // Assign the specification to a local variable vlSpec.
+      var vlSpec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 500,
+  "height": 400,
+  "title": "COVID-19 Cases per Country (13 Oct 2020)",
+  "data": {
+  "url": "https://raw.githubusercontent.com/KaneSec/vega_lite/main/4_interactive_scatter_plot/data/COVID_19_10_Oct_2020.csv"
+  },
+  "vconcat": [{
+
+  "transform": [
+      {"filter": "datum.Active > 0"},
+      {"filter": "datum.Deaths > 0"},
+      {
+      "calculate": "datum.Confirmed/datum.Population * 10000",
+      "as": "Cases per 10,000 Population"
+      }
+  ],
+    "params": [{
+      "name": "select",
+      "value": null,
+      "select": {"type": "point", "fields": ["Continent"]},
+      "bind": {"input": "select", "options": [null, "North America", "South America", "Europe", "Africa", "Asia", "Oceania"]}
+    }],
+    "mark": "circle",
+    "encoding": {
+    "x": {
+    "field": "Confirmed",
+    "type": "quantitative",
+    "title": "Confirmed Cases",
+    "axis": {"tickCount": 7},
+    "scale": {"type": "log", "domain": [1, 10000000]}
+  },
+  "y": {
+  "field": "Deaths",
+  "type": "quantitative",
+  "axis": {"tickCount": 6},
+  "scale": {"type": "log", "domain": [1, 1000000]}
+  },
+  "color": {
+    
+      "condition": {
+        "param": "select",
+        "field": "Continent", "type": "nominal"},
+      "value": "grey"
+  },
+  "opacity": {
+  "value": 0.6
+  },
+  "size": {
+  "field": "Population",
+  "type": "quantitative",
+  "scale": {
+  "type": "threshold",
+  "domain": [1000000, 10000000, 50000000, 100000000, 500000000],
+  "range": [10, 50, 150, 200, 300, 400]
+  },
+  "legend": {"format": ".1s"}
+  },
+  "tooltip": [
+  {"field": "Country", "type": "nominal"},
+  {"field": "Confirmed", "type": "quantitative", "format": ","},
+  {"field": "Active", "type": "quantitative", "format": ","},
+  {"field": "Deaths", "type": "quantitative", "format": ","},
+  {"field": "Recovered", "type": "quantitative", "format": ","},
+  {
+  "field": "Cases per 10,000 Population",
+  "type": "quantitative",
+  "format": ".2f"
+  }
+  ]
+  }
+  },
+  {
+    "mark": "bar",
+      "encoding": {
+        "x": {"field": "Continent", "type": "nominal"},
+        "y": {"title": "Total Deaths", "field": "Deaths", "type": "quantitative"}
+      }
+  }]
+};
+
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis', vlSpec);
+    </script>
+  </body>
+</html>
